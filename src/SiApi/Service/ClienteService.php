@@ -2,14 +2,14 @@
 
 namespace SiApi\Service;
 
-use SiApi\Entity\Clientes;
+use SiApi\Entity\Cliente;
 use SiApi\Mapper\ClienteMapper;
 
 class ClienteService
 {
 
     /**
-     * @var Clientes
+     * @var Cliente
      */
     private $cliente;
     /**
@@ -17,7 +17,7 @@ class ClienteService
      */
     private $clienteMapper;
 
-    public function __construct(Clientes $cliente, ClienteMapper $clienteMapper)
+    public function __construct(Cliente $cliente, ClienteMapper $clienteMapper)
     {
         $this->cliente = $cliente;
         $this->clienteMapper = $clienteMapper;
@@ -37,7 +37,19 @@ class ClienteService
     public function fetchAll()
     {
         $mapper = $this->clienteMapper;
-        return $mapper->fetchAll();
+        $lista =  $mapper->fetchAll();
+
+        //transformando Cliente em array
+        $resultado = array();
+        $i =0;
+        foreach ($lista as $item) {
+            $resultado[$i]['id'] = $item->getId();
+            $resultado[$i]['nome'] = $item->getNome();
+            $resultado[$i]['email'] = $item->getEmail();
+            $i++;
+        }
+        //retornando um array
+        return $resultado;
     }
 
 
@@ -47,10 +59,14 @@ class ClienteService
         return $mapper->find($id);
     }
 
-    public function update(int $id,array $arr)
+    public function update($id,array $arr)
     {
         $mapper = $this->clienteMapper;
-        return $mapper->update($id,$arr);
+        $entity = $this->cliente;
+
+        $entity->setNome($arr['nome']);
+        $entity->setEmail($arr['email']);
+        return $mapper->update($id,$entity);
     }
 
     public function delete(int $id)

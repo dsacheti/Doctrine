@@ -2,7 +2,7 @@
 
 namespace SiApi\Mapper;
 
-use SiApi\Entity\Clientes;
+use SiApi\Entity\Cliente;
 use Doctrine\ORM\EntityManager;
 
 class ClienteMapper {
@@ -24,7 +24,7 @@ class ClienteMapper {
         ]
     ];
 
-    public function insert(Clientes $cliente)
+    public function insert(Cliente $cliente)
     {
         $this->em->persist($cliente);
         $this->em->flush();
@@ -37,23 +37,34 @@ class ClienteMapper {
 
     }
 
-    public function fetchAll(){
-        $dados = $this->dados;
-        return $dados;
+    public function fetchAll()
+    {
+        $lista = $this->em->getRepository('SiApi\Entity\Cliente')->findAll();
+        return $lista;
+
     }
 
-    public function find($id){
+    public function find($id)
+    {
         return $this->dados[$id];
     }
 
-    public function update($id,$dados)
+    public function update($id,Cliente $cliente)
     {
-        $this->dados[$id]['nome'] = $dados['nome'];
-        $this->dados[$id]['email'] = $dados['email'];
+        $entity = $this->em->getRepository('SiApi\Entity\Cliente')->find($id);
+        $entity->setNome($cliente->getNome());
+        $entity->setEmail($cliente->getEmail());
+        $this->em->persist($entity);
+        $this->em->flush();
 
-       // return $this-
-        return [
-            'success' => true
-        ];
+        return ['Sucesso' =>'Cliente: '.$cliente->getNome().' atualizado com sucesso'];
+    }
+
+    public function delete($id)
+    {
+        $entity = $this->em->getRepository('SiApi\Entity\Cliente')->find($id);
+        $this->em->remove($entity);
+        $this->em->flush();
+        return ['Sucesso'=>'Cliente: '.$entity->getNome().' apagado'];
     }
 }

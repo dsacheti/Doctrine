@@ -1,11 +1,10 @@
-<h1>Clientes</h1>
+{% extends 'layout.twig' %}
+{% block conteudo %}
+<h2>Clientes</h2>
 
 <ul>
     {% for cliente in clientes %}
-        <li>{{  cliente.nome }} - {{ cliente.email }}</li>
+        <li><b>Nome:</b> {{  cliente['nome'] }} - <b>Email:</b> {{ cliente['email'] }}</li>
     {% endfor %}
-
-    <p><a href="{{ url('home') }}">Home</a> </p>
-    <p><a href="{{ url('cadcliente') }}">Cadastro de cliente</a></p>
-    <p><a href="{{ url('listClientes') }}">Lista de clientes</a> </p>
 </ul>
+{% endblock %}

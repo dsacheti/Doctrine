@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="clientes")
  */
-class Clientes
+class Cliente
  {
     /**
      *
@@ -85,5 +85,13 @@ class Clientes
                                 ]
                         ];
                 return $cli;
+     }
+
+     public function toArray()
+     {
+         return  [
+             'nome' => $this->getNome(),
+            'email' => $this->getEmail()
+         ];
      }
  }
