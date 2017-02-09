@@ -1,0 +1,19 @@
+{
+    "require": {
+        "silex/silex": "1.*",
+        "twig/twig": "1.29.0",
+        "symfony/twig-bridge": "2.6.*",
+        "doctrine/orm": "2.4",
+        "gedmo/doctrine-extensions":"2.4.*"
+    },
+    
+    "config": {
+        "bin-dir": "bin/"
+    },
+    
+    "autoload" :{
+        "psr-4":{
+            "SiApi\\" :"src/SiApi/"
+        }
+    }
+}
