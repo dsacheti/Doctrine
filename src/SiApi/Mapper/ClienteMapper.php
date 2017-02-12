@@ -54,7 +54,6 @@ class ClienteMapper {
         $entity = $this->em->getRepository('SiApi\Entity\Cliente')->find($id);
         $entity->setNome($cliente->getNome());
         $entity->setEmail($cliente->getEmail());
-        $this->em->persist($entity);
         $this->em->flush();
 
         return ['Sucesso' =>'Cliente: '.$cliente->getNome().' atualizado com sucesso'];
