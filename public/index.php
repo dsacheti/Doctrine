@@ -8,10 +8,7 @@ use SiApi\Mapper\ClienteMapper;
 use Symfony\Component\HttpFoundation\Request;
 
 $app['clienteService'] = function () use ($em){
-    $clienteEntity = new Cliente();
-    $clienteMapper = new ClienteMapper($em);
-
-    $clienteService = new ClienteService($clienteEntity,$clienteMapper);
+    $clienteService = new ClienteService($em);
     return $clienteService;
 };
 $response = new Response();
@@ -35,10 +32,38 @@ $app->get('/api/clientes',function() use ($app){
     return $app->json($dados);
 });
 
+/*paginação
+*o usuário define a página e número de resultados desejados
+*/
+$app->get('/api/clientes/pagina/{pg}/{numResultados}',function($pg,$numResultados) use($app)
+{
+    $dados = $app['clienteService']->fetchPage($pg,$numResultados);
+    return $app->json($dados);
+});
+
+/*paginação
+*o usuário define a página e o número de resultados é definido pelo sistema
+*/
+$app->get('/api/clientes/pagina/{pg}',function($pg) use($app)
+{
+    $dados = $app['clienteService']->fetchPageSimple($pg);
+    return $app->json($dados);
+});
+
 //listar um
 $app->get('/api/clientes/{id}',function($id) use ($app){
     $dados = $app['clienteService']->find($id);
     return $app->json($dados);
+});
+
+/*
+ * Buscar:
+ * O sistema detecta se é um email ou nome e faz a busca
+ */
+$app->get('/api/clientes/busca/{param}',function($param) use($app){
+    $param = utf8_decode($param);
+    $resultado = $app['clienteService']->buscar($param);
+    return $app->json($resultado);
 });
 
 //cadastrar

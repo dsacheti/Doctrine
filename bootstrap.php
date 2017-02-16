@@ -14,62 +14,43 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\ClassLoader;
 
-$cache = new Cache;
-$annotationReader = new AnnotationReader;
+$cache = new Doctrine\Common\Cache\ArrayCache;
+$annotationReader = new Doctrine\Common\Annotations\AnnotationReader;
 
 $cachedAnnotationReader = new Doctrine\Common\Annotations\CachedReader(
-	$annotationReader,//usar o AnnotationReader
-	$cache //usando ArrayCache (cache driver)
+    $annotationReader, // use reader
+    $cache // and a cache driver
 );
 
+$annotationDriver = new Doctrine\ORM\Mapping\Driver\AnnotationDriver(
+    $cachedAnnotationReader, // our cached annotation reader
+    array(__DIR__ . DIRECTORY_SEPARATOR . 'src')
+);
 
 $driverChain = new Doctrine\ORM\Mapping\Driver\DriverChain();
-//carrega a superclasse de mapeamento de metadata somente no driver chain
-//registra Gedmo annotations.NOTE: você pode personaliazar
-Gedmo\DoctrineExtensions::registerAbstractMappingIntoDriverChainORM(
-	$driverChain,
-	$cachedAnnotationReader
-);
-
-
-//agora nós queremos registrar as entidades da aplicação
-//para isso nós precisamos de outro driver da metadados usado para o namespace das entidades
-$annotationDriver = new Doctrine\ORM\Mapping\Driver\AnnotationDriver(
-	$cachedAnnotationReader,
-	array(__DIR__.DIRECTORY_SEPARATOR.'src')
-);
-
 $driverChain->addDriver($annotationDriver,'SiApi');
 
-$config = new Configuration;
+$config = new Doctrine\ORM\Configuration;
 $config->setProxyDir('/tmp');
 $config->setProxyNamespace('Proxy');
-$config->setAutoGenerateProxyClasses(true);
-
-//registrando driver de metadados
+$config->setAutoGenerateProxyClasses(true); // this can be based on production config.
+// register metadata driver
 $config->setMetadataDriverImpl($driverChain);
-
-//usar o driver de cache já inicializado
+// use our allready initialized cache driver
 $config->setMetadataCacheImpl($cache);
 $config->setQueryCacheImpl($cache);
 
-AnnotationRegistry::registerFile(__DIR__.DIRECTORY_SEPARATOR.'vendor'. 
-        DIRECTORY_SEPARATOR . 'doctrine' . DIRECTORY_SEPARATOR . 'orm' . 
-        DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Doctrine' . 
-        DIRECTORY_SEPARATOR . 'ORM' . DIRECTORY_SEPARATOR . 'Mapping' . 
-        DIRECTORY_SEPARATOR . 'Driver' . DIRECTORY_SEPARATOR . 'DoctrineAnnotations.php');
+AnnotationRegistry::registerFile(__DIR__. DIRECTORY_SEPARATOR .
+    'vendor' . DIRECTORY_SEPARATOR .
+    'doctrine' . DIRECTORY_SEPARATOR .
+    'orm' . DIRECTORY_SEPARATOR .
+    'lib' . DIRECTORY_SEPARATOR .
+    'Doctrine' . DIRECTORY_SEPARATOR .
+    'ORM' . DIRECTORY_SEPARATOR .
+    'Mapping' . DIRECTORY_SEPARATOR .
+    'Driver' . DIRECTORY_SEPARATOR . 'DoctrineAnnotations.php');
 
-// Third, create event manager and hook prefered extension listeners
 $evm = new Doctrine\Common\EventManager();
-
-// sluggable
-$sluggableListener = new Gedmo\Sluggable\SluggableListener;
-// you should set the used annotation reader to listener, to avoid creating new one for mapping drivers
-$sluggableListener->setAnnotationReader($cachedAnnotationReader);
-$evm->addEventSubscriber($sluggableListener);
-
-
-//getting the EntityManager
 $em = EntityManager::create(
     array(
         'driver'  => 'pdo_mysql',
@@ -82,6 +63,7 @@ $em = EntityManager::create(
     $config,
     $evm
 );
+
 
 
 $app = new \Silex\Application();

@@ -37,11 +37,11 @@ class ClienteMapper {
 
     }
 
-    public function fetchAll()
+    public function getAllAsc()
     {
-        $lista = $this->em->getRepository('SiApi\Entity\Cliente')->findAll();
-        return $lista;
-
+        $dql = "SELECT cli FROM SiApi\Entity\Clientes cli ORDER BY cli.nome ASC";
+        $consulta = $this->getEntityManager()->createQuery($dql);
+        return $consulta->getResult();
     }
 
     public function find($id)

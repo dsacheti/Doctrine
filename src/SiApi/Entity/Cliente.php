@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * 
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="SiApi\Entity\ClienteRepository")
  * @ORM\Table(name="clientes")
  */
 class Cliente
@@ -36,7 +36,7 @@ class Cliente
       */
      public function getNome()
      {
-                return $this->nome;
+         return $this->nome;
      }
 
      /**
@@ -44,15 +44,15 @@ class Cliente
       */
      public function setNome($name)
      {
-                $this->nome = $name;
-            }
+         $this->nome = $name;
+     }
 
      /**
       * @return mixed
       */
      public function getEmail()
      {
-                return $this->email;
+         return $this->email;
      }
 
      /**
@@ -61,37 +61,9 @@ class Cliente
      public function setEmail($email)
      {
                 $this->email = $email;
-            }
-
-            function getId() {
-                return $this->id;
-            }           
-
-                 public function getAll(){
-                $cli = [
-                        'clientes' =>[
-                                    [
-                                            'nome' => 'Jovair',
-                                            'email' => 'jovair@hotmail.com'
-                                            ],
-                                    [
-                                            'nome' => 'Nelson',
-                                            'email' => 'nelson@hotmail.com'
-                                            ],
-                                    [
-                                            'nome' => 'Richard',
-                                            'email' => 'richard@hotmail.com'
-                                            ],
-                                ]
-                        ];
-                return $cli;
      }
 
-     public function toArray()
-     {
-         return  [
-             'nome' => $this->getNome(),
-            'email' => $this->getEmail()
-         ];
-     }
+    function getId() {
+        return $this->id;
+    }
  }
