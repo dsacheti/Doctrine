@@ -21,12 +21,20 @@ class ClienteService
     public function insert(array $data)
     {
         $cliente = new Cliente();
-        $cliente = new Cliente();
-        $cliente->setNome($data['nome']);
-        $cliente->setEmail($data['email']);
+        if($this->validarString($data['nome'])) {
+            $cliente->setNome($data['nome']);
+        } else {
+            return ['Erro' => 'O nome não pode ficar em branco'];
+        }
+        if($this->validarString($data['email'])) {
+            $cliente->setEmail($data['email']);
+        } else {
+            return ['Erro' => 'O email não pode ficar em branco'];
+        }
 
         $this->em->persist($cliente);
         $this->em->flush();
+        return ['Sucesso' =>'Cliente '.$cliente->getNome().' cadastrado.'];
     }
 
     public function fetchAll()
@@ -47,19 +55,30 @@ class ClienteService
             'nome' => $cliente->getNome(),
             'email' => $cliente->getEmail()
         ];
-        return $resultado;
+        if (!empty($resultado)) {
+            return $resultado;
+        } else {
+            return ['Erro' => 'Nenhum resultado encontado'];
+        }
     }
 
     public function update(int $id,array $arr)
     {
         $cliente = $this->em->getReference('SiApi\Entity\Cliente',$id);
-
-        $cliente->setNome($arr['nome']);
-        $cliente->setEmail($arr['email']);
+        if($this->validarString($arr['nome'])) {
+            $cliente->setNome($arr['nome']);
+        } else {
+            return ['Erro' => 'O nome não pode ficar em branco'];
+        }
+        if($this->validarString($arr['email'])) {
+            $cliente->setEmail($arr['email']);
+        } else {
+            return ['Erro' => 'O email não pode ficar em branco'];
+        }
 
         $this->em->persist($cliente);
         $this->em->flush();
-        return ['Sucesso' =>'Os dados do cliente foram atualizados'];
+        return ['Sucesso' =>'Os dados do cliente '.$cliente->getNome().' foram atualizados'];
     }
 
     public function delete(int $id)
@@ -87,7 +106,13 @@ class ClienteService
 
         $repo = $this->em->getRepository('SiApi\Entity\Cliente');
         $pg = $repo->getPagedClientes($inicial,$max);
-        return $this->parseResult($pg);
+        $resultado =  $this->parseResult($pg);
+
+        if (!empty($resultado)) {
+            return $resultado;
+        } else {
+            return ['Erro' => 'Nenhum resultado encontado'];
+        }
     }
 
     public function fetchPage($pagina,$numRes)
@@ -113,23 +138,64 @@ class ClienteService
 
         $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
         $pg = $repositorio->getPagedClientes($inicial,$max);
-        return $this->parseResult($pg);
+        $resultado =  $this->parseResult($pg);
+
+        if (!empty($resultado)) {
+            return $resultado;
+        } else {
+            return ['Erro' => 'Nenhum resultado encontado'];
+        }
     }
 
-    public function buscar($param)
+    public function buscarNome($nome)
     {
-        $cliente = new Cliente();
         $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
-        if (filter_var($param, FILTER_VALIDATE_EMAIL)) {
-            $cliente = $repositorio->findEmail($param);
+        $lista = $repositorio->findNome($nome);
+        $resultado = $this->parseResult($lista);
+        if (!empty($resultado)) {
+            return $resultado;
+        } else {
+            return ['Erro' => 'Nenhum cliente encontado com o nome '.$nome];
         }
-        $cliente = $repositorio->findNome($param);
-        $resultado = [
-            'id' => $cliente->getId(),
-            'nome' => $cliente->getNome(),
-            'email' => $cliente->getEmail()
-        ];
-        return $resultado;
+    }
+
+    public function buscarEmail($email)
+    {
+        $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
+        $lista = $repositorio->findEmail($email);
+        $resultado =  $this->parseResult($lista);
+
+        if (!empty($resultado)) {
+            return $resultado;
+        } else {
+            return ['Erro' => 'Nenhum cliente encontado com o email: '.$email];
+        }
+    }
+
+    public function buscarNomeContem($nm)
+    {
+        $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
+        $lista = $repositorio->findNomeContains($nm);
+        $resultado = $this->parseResult($lista);
+
+        if (!empty($resultado)) {
+            return $resultado;
+        } else {
+            return ['Erro' => 'Nenhum cliente encontrado com '.$nm.' no nome'];
+        }
+    }
+
+    public function buscarEmailContem($mail)
+    {
+        $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
+        $lista = $repositorio->findEmailContains($mail);
+        $resultado =  $this->parseResult($lista);
+
+        if (!empty($resultado)) {
+            return $resultado;
+        } else {
+            return ['Erro' => 'Nenhum cliente encontado com '.$mail.' no email'];
+        }
     }
 
     //o parametro deve ser um array de SiApi\Entity\Cliente
@@ -145,5 +211,15 @@ class ClienteService
         }
         //retornando um array
         return $resultado;
+    }
+
+    private function validarString($entrada)
+    {
+        $entrada = trim($entrada);
+        if (!strlen($entrada) > 0 ) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

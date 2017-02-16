@@ -56,5 +56,21 @@ class ClienteRepository extends EntityRepository
             ->setParameter('email', $email)
             ->getQuery()
             ->getResult();
+
     }
+
+    public function findNomeContains($nm)
+    {
+        $dql = "SELECT cli FROM SiApi\Entity\Cliente cli WHERE cli.nome LIKE :nm";
+        $consulta = $this->getEntityManager()->createQuery($dql)->setParameter('nm','%'.$nm.'%');
+        return $consulta->getResult();
+    }
+
+    public function findEmailContains($mail)
+    {
+        $dql = "SELECT cli FROM SiApi\Entity\Cliente cli WHERE cli.email LIKE :mail";
+        $consulta = $this->getEntityManager()->createQuery($dql)->setParameter('mail','%'.$mail.'%');
+        return $consulta->getResult();
+    }
+
 }
