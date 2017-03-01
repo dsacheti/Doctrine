@@ -2,10 +2,10 @@
 
 namespace SiApi\Service;
 
-use SiApi\Entity\Cliente;
+use SiApi\Entity\Tag;
 use Doctrine\Orm\EntityManager;
 
-class ClienteService
+class TagService
 {
 
     /**
@@ -20,27 +20,23 @@ class ClienteService
 
     public function insert(array $data)
     {
-        $cliente = new Cliente();
+        $tag = new Tag();
         if($this->validarString($data['nome'])) {
-            $cliente->setNome($data['nome']);
+            $tag->setNome($data['nome']);
         } else {
             return ['Erro' => 'O nome não pode ficar em branco'];
         }
-        if($this->validarString($data['email'])) {
-            $cliente->setEmail($data['email']);
-        } else {
-            return ['Erro' => 'O email não pode ficar em branco'];
-        }
 
-        $this->em->persist($cliente);
+
+        $this->em->persist($tag);
         $this->em->flush();
-        return ['Sucesso' =>'Cliente '.$cliente->getNome().' cadastrado.'];
+        return ['Sucesso' =>'Tag '.$tag->getNome().' cadastrada.'];
     }
 
     public function fetchAll()
     {
-        $repository = $this->em->getRepository('SiApi\Entity\Cliente');
-        $lista = $repository->getAllAsc();
+        $repository = $this->em->getRepository('SiApi\Entity\Tag');
+        $lista = $repository->getAllAscNome();
 
         return $this->parseResult($lista);
     }
@@ -48,12 +44,11 @@ class ClienteService
 
     public function find(int $id)
     {
-        $repository = $this->em->getRepository('SiApi\Entity\Cliente');
-        $cliente =  $repository->find($id);
+        $repository = $this->em->getRepository('SiApi\Entity\Tag');
+        $tag =  $repository->find($id);
         $resultado = [
-            'id' => $cliente->getId(),
-            'nome' => $cliente->getNome(),
-            'email' => $cliente->getEmail()
+            'id' => $tag->getId(),
+            'nome' => $tag->getNome()
         ];
         if (!empty($resultado)) {
             return $resultado;
@@ -64,29 +59,25 @@ class ClienteService
 
     public function update(int $id,array $arr)
     {
-        $cliente = $this->em->getReference('SiApi\Entity\Cliente',$id);
+        $tag = $this->em->getReference('SiApi\Entity\Tag',$id);
         if($this->validarString($arr['nome'])) {
-            $cliente->setNome($arr['nome']);
+            $tag->setNome($arr['nome']);
         } else {
             return ['Erro' => 'O nome não pode ficar em branco'];
         }
-        if($this->validarString($arr['email'])) {
-            $cliente->setEmail($arr['email']);
-        } else {
-            return ['Erro' => 'O email não pode ficar em branco'];
-        }
 
-        $this->em->persist($cliente);
+
+        $this->em->persist($tag);
         $this->em->flush();
-        return ['Sucesso' =>'Os dados do cliente '.$cliente->getNome().' foram atualizados'];
+        return ['Sucesso' =>'Os dados da tag '.$tag->getNome().' foram atualizados'];
     }
 
     public function delete(int $id)
     {
-        $repositorio = $this->em->getReference('SiApi\Entity\Cliente',$id);
+        $repositorio = $this->em->getReference('SiApi\Entity\Tag',$id);
         $this->em->remove($repositorio);
         $this->em->flush();
-        return ['Sucesso' =>'Cliente apagado.'];
+        return ['Sucesso' =>'Tag apagada.'];
     }
 
     public function fetchPageSimple($pagina)
@@ -104,8 +95,8 @@ class ClienteService
             $inicial = ($max * $pagina) - $max;
         }
 
-        $repo = $this->em->getRepository('SiApi\Entity\Cliente');
-        $pg = $repo->getPagedClientes($inicial,$max);
+        $repo = $this->em->getRepository('SiApi\Entity\Tag');
+        $pg = $repo->getPagedTags($inicial,$max);
         $resultado =  $this->parseResult($pg);
 
         if (!empty($resultado)) {
@@ -136,8 +127,8 @@ class ClienteService
             $inicial = ($max * $pagina) - $max;
         }
 
-        $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
-        $pg = $repositorio->getPagedClientes($inicial,$max);
+        $repositorio = $this->em->getRepository('SiApi\Entity\Tag');
+        $pg = $repositorio->getPagedTags($inicial,$max);
         $resultado =  $this->parseResult($pg);
 
         if (!empty($resultado)) {
@@ -149,56 +140,34 @@ class ClienteService
 
     public function buscarNome($nome)
     {
-        $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
+        $repositorio = $this->em->getRepository('SiApi\Entity\Tag');
         $lista = $repositorio->findNome($nome);
         $resultado = $this->parseResult($lista);
         if (!empty($resultado)) {
             return $resultado;
         } else {
-            return ['Erro' => 'Nenhum cliente encontado com o nome '.$nome];
+            return ['Erro' => 'Nenhuma tag encontrada com o nome '.$nome];
         }
     }
 
-    public function buscarEmail($email)
-    {
-        $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
-        $lista = $repositorio->findEmail($email);
-        $resultado =  $this->parseResult($lista);
 
-        if (!empty($resultado)) {
-            return $resultado;
-        } else {
-            return ['Erro' => 'Nenhum cliente encontado com o email: '.$email];
-        }
-    }
 
     public function buscarNomeContem($nm)
     {
-        $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
+        $repositorio = $this->em->getRepository('SiApi\Entity\Tag');
         $lista = $repositorio->findNomeContains($nm);
         $resultado = $this->parseResult($lista);
 
         if (!empty($resultado)) {
             return $resultado;
         } else {
-            return ['Erro' => 'Nenhum cliente encontrado com '.$nm.' no nome'];
+            return ['Erro' => 'Nenhuma tag encontrado com '.$nm.' no nome'];
         }
     }
 
-    public function buscarEmailContem($mail)
-    {
-        $repositorio = $this->em->getRepository('SiApi\Entity\Cliente');
-        $lista = $repositorio->findEmailContains($mail);
-        $resultado =  $this->parseResult($lista);
 
-        if (!empty($resultado)) {
-            return $resultado;
-        } else {
-            return ['Erro' => 'Nenhum cliente encontado com '.$mail.' no email'];
-        }
-    }
 
-    //o parametro deve ser um array de SiApi\Entity\Cliente
+    //o parametro deve ser um array de SiApi\Entity\Tag
     private function parseResult($lista)
     {
         $resultado = array();
@@ -206,7 +175,6 @@ class ClienteService
         foreach ($lista as $item) {
             $resultado[$i]['id'] = $item->getId();
             $resultado[$i]['nome'] = $item->getNome();
-            $resultado[$i]['email'] = $item->getEmail();
             $i++;
         }
         //retornando um array
