@@ -159,7 +159,7 @@ class ProdutoService
         $inicial =0;
         if ($pagina > 1) {
             //se a página for 2, por exemplo, para que não inicie no 20 mas sim no 11 temos:
-            $inicial = ($max * $pagina) - $max;
+            $inicial = ($max * $pagina) - ($max-1);
         }
 
         $repo = $this->em->getRepository('SiApi\Entity\Produto');
@@ -171,6 +171,30 @@ class ProdutoService
         } else {
             return ['Erro' => 'Nenhum resultado encontado'];
         }
+    }
+
+    public function buscarPorTag($tag)
+    {
+        $repositorio = $this->em->getRepository('SiApi\Entity\Tag');
+        $lista = $repositorio->findNome($tag);
+        $resultado = array();
+        $i =0;
+        foreach ($lista as $item) {
+
+            $j =0;
+            $resultado[$i]['Tag'] = $item->getNome();
+            foreach ($item->getProdutos() as $prod) {
+                $resultado[$i]['Produtos'][$j] = [ 'Nome' => $prod->getNome(),
+                    'Descrição' => $prod->getDescricao(),
+                    'Valor' => $prod->getValor()
+                ];
+                $j++;
+            }
+            $i++;
+        }
+        //retornando um array
+        return $resultado;
+
     }
 
     public function fetchPage($pagina,$numRes)
@@ -257,7 +281,7 @@ class ProdutoService
         }
     }
 
-    //o parametro deve ser um array de SiApi\Entity\Produto
+   //o parametro deve ser um array de SiApi\Entity\Produto
     private function parseResult($lista)
     {
         $resultado = array();

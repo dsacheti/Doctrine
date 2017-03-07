@@ -8,6 +8,7 @@
 
 namespace SiApi\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 /**
  *
@@ -29,6 +30,18 @@ class Tag
      * @ORM\Column(type="string",length=100)
      */
     private $nome;
+
+    /**
+     * Many Groups have Many Users.
+     * @ORM\ManyToMany(targetEntity="SiApi\Entity\Produto", mappedBy="tags")
+     */
+    private $produtos;
+
+
+    public function __construct()
+    {
+        $this->produtos = new ArrayCollection();
+    }
 
     /**
      * @return mixed
@@ -62,5 +75,21 @@ class Tag
         $this->nome = $nome;
     }
 
+    public function getProdutos()
+    {
+        return $this->produtos;
+    }
 
+    public function addProduto($produto)
+    {
+        $this->produtos->add($produto);
+    }
+
+    public function putProdutos($produtos)
+    {
+        $this->produtos->clear();
+        foreach($produtos as $p) {
+            $this->produtos->add($p);
+        }
+    }
 }

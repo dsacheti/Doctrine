@@ -175,10 +175,17 @@ class TagService
         foreach ($lista as $item) {
             $resultado[$i]['id'] = $item->getId();
             $resultado[$i]['nome'] = $item->getNome();
+            $j =0;
+            foreach ($item->getProdutos() as $prod) {
+                $resultado[$i]['Produtos'][$j] = $prod->getNome();
+                $j++;
+            }
             $i++;
         }
         //retornando um array
         return $resultado;
+
+
     }
 
     private function validarString($entrada)
@@ -190,4 +197,6 @@ class TagService
             return true;
         }
     }
+
+
 }

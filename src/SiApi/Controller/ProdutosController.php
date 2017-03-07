@@ -77,7 +77,12 @@ class ProdutosController implements ControllerProviderInterface
             return $app->json($resultado);
         });
 
-        //cadastrar
+        //buscar por tag
+        $prodController->get('/produtos/tag/{tag}',function($tag) use ($app){
+            $resultado = $app['produtoService']->buscarPorTag($tag);
+            return $app->json($resultado);
+        });
+
         $prodController->post('/produtos',function(Request $request)use($app){
             $dados['nome'] = $request->get('nome');
             $dados['desc'] = $request->get('desc');

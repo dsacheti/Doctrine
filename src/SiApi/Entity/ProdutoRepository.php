@@ -5,6 +5,7 @@ namespace SiApi\Entity;
 
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use  Doctrine\ORM\Tools\Pagination\Paginator;
 
 class ProdutoRepository extends EntityRepository
@@ -26,7 +27,7 @@ class ProdutoRepository extends EntityRepository
 
     public function getPagedProdutos($inicial,$max)
     {
-        $dql = "SELECT p FROM SiApi\Entity\Produto p";
+        $dql = "SELECT p FROM SiApi\Entity\Produto p ORDER BY p.id";
         $consulta = $this->getEntityManager()->createQuery($dql)
             ->setFirstResult($inicial)
             ->setMaxResults($max);
@@ -41,7 +42,7 @@ class ProdutoRepository extends EntityRepository
         return $queryB->select('p')
             ->from('SiApi\Entity\Produto', 'p')
             ->where('p.nome = :nm')
-            ->setParameter('nm', $nome)
+            ->setParameter('nm', $nome,'string')
             ->getQuery()
             ->getResult();
     }

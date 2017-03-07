@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Entity(repositoryClass="SiApi\Entity\ProdutoRepository")
  * @ORM\Table(name="produtos")
+ * @ORM\HasLifecycleCallbacks
  */
 class Produto
 {
@@ -177,5 +178,9 @@ class Produto
         return $this;
     }
 
-
+    /** @ORM\PrePersist */
+    public function processImg($arquivo)
+    {
+        
+    }
 }
